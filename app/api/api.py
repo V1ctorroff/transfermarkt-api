@@ -1,38 +1,30 @@
+# app/main.py
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
-from clerk_backend_api import Clerk   # import correto do SDK oficial
-from app.api.api import api_router  
 
-# Coloque sua chave aqui (não recomendado para produção)
-CLERK_SECRET_KEY = "sk_test_y4kxPs5EjcUEEVdUkBGT1kV1VPNtcOqKnSaxbjcmpd"
-
-clerk = Clerk(api_key=CLERK_SECRET_KEY)
+# Chave secreta fixa
+API_SECRET_KEY = "oipi0asdi0vnjxçlkaosopjdieniubcjxlkncjbsuahwuhicenjbxiubaiuboid"
 
 app = FastAPI()
 
-def require_clerk_session(request: Request):
+def require_api_key(request: Request):
     """
-    Verifica se há sessão válida com Clerk.
-    Levanta HTTPException(401) se não for válido.
+    Verifica se a requisição possui a chave correta nos headers.
     """
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing Bearer token")
 
     token = auth_header.split(" ")[1]
+    if token != API_SECRET_KEY:
+        raise HTTPException(status_code=403, detail="Invalid API key")
 
-    try:
-        session = clerk.sessions.verify_session(token)
-        return session
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Invalid Clerk session: {str(e)}")
-
-app.include_router(
-    api_router,
-    prefix="/api",
-    dependencies=[Depends(require_clerk_session)]
-)
+    return True
 
 @app.get("/")
 async def root():
     return {"status": "ok", "message": "Service está rodando"}
+
+@app.get("/secure-data")
+async def secure_data(dep: bool = Depends(require_api_key)):
+    return {"status": "ok", "data": "Aqui estão os dados seguros!"}
