@@ -16,8 +16,12 @@ fastapi = "==0.115.6"
 uvicorn = {extras = ["standard"], version = "==0.34.0"}
 slowapi = "==0.1.9"
 pydantic-settings = "==2.7.1"
-pydantic= "==2.10.4"
+pydantic = "==2.10.4"
 python-dateutil = "==2.9.0.post0"
+
+# Dependências adicionadas para Clerk
+clerk-backend-api = "^1.0.0"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "==1.0.0"
@@ -43,20 +47,18 @@ preview = true
 unsafe-fixes = true
 line-length = 120
 lint.select = [
-    "F",  # pyflakes
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "I",  # isort
-    "COM",  # flake8-commas
-    "Q",  # flake8-quotes
-    "FAST",  # fastapi
+  "F", # pyflakes
+  "E", # pycodestyle errors
+  "W", # pycodestyle warnings
+  "I", # isort
+  "COM", # flake8-commas
+  "Q", # flake8-quotes
+  "FAST", # fastapi
 ]
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --exitfirst"
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 
 [tool.interrogate]
 ignore-init-module = true
