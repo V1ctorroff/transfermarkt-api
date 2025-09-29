@@ -1,11 +1,8 @@
-# app/main.py
-from fastapi import FastAPI, Request, HTTPException, Depends
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, HTTPException, Depends
 
-# Chave secreta fixa
+from app.api.endpoints import clubs, competitions, players
+
 API_SECRET_KEY = "oipi0asdi0vnjxçlkaosopjdieniubcjxlkncjbsuahwuhicenjbxiubaiuboid"
-
-app = FastAPI()
 
 def require_api_key(request: Request):
     """
@@ -21,10 +18,24 @@ def require_api_key(request: Request):
 
     return True
 
-@app.get("/")
-async def root():
-    return {"status": "ok", "message": "Service está rodando"}
 
-@app.get("/secure-data")
-async def secure_data(dep: bool = Depends(require_api_key)):
-    return {"status": "ok", "data": "Aqui estão os dados seguros!"}
+api_router = APIRouter()
+
+api_router.include_router(
+    competitions.router,
+    prefix="/competitions",
+    tags=["competitions"],
+    dependencies=[Depends(require_api_key)]
+)
+api_router.include_router(
+    clubs.router,
+    prefix="/clubs",
+    tags=["clubs"],
+    dependencies=[Depends(require_api_key)]
+)
+api_router.include_router(
+    players.router,
+    prefix="/players",
+    tags=["players"],
+    dependencies=[Depends(require_api_key)]
+)
